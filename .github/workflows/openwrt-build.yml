@@ -1,4 +1,4 @@
-name: OpenWrt Multi Device Builder
+name: OpenWrt Stable Multi Device Builder
 
 permissions:
   contents: write
@@ -95,81 +95,61 @@ jobs:
 
       - name: Clone OpenWrt
         run: |
-
           git clone --depth 1 --branch $REPO_BRANCH $REPO_URL openwrt
-
           cd openwrt
-
           echo "COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Update feeds
         run: |
-
           cd openwrt
-
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
       - name: Load device config
         run: |
-
           cp ${{ matrix.device.config }} openwrt/.config
 
       - name: Enable ccache
         run: |
-
           echo "CONFIG_CCACHE=y" >> openwrt/.config
 
       - name: Defconfig
         run: |
-
           cd openwrt
           make defconfig
 
       - name: Download sources
         run: |
-
           cd openwrt
           make download -j$(nproc)
 
       - name: Build tools
         run: |
-
           cd openwrt
           make tools/install -j$(nproc)
 
       - name: Build toolchain
         run: |
-
           cd openwrt
           make toolchain/install -j$(nproc)
 
       - name: Build firmware
         run: |
-
           cd openwrt
-
           make -j$(nproc) V=s
 
       - name: Organize firmware
         run: |
-
           cd openwrt/bin/targets/*/*
-
           rm -rf packages
-
           echo "DIR=$PWD" >> $GITHUB_ENV
-
           echo "DATE=$(date +%F-%H%M)" >> $GITHUB_ENV
-
           cp version.buildinfo $GITHUB_WORKSPACE/version.buildinfo
 
       - name: Extract version
         id: version
         run: |
-
           VERSION=$(grep OpenWrt version.buildinfo | awk '{print $2}')
-
           REVISION=$(grep OpenWrt version.buildinfo | awk '{print $3}')
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -178,7 +158,6 @@ jobs:
       - name: Changelog
         id: log
         run: |
-
           cd openwrt
 
           git log -15 --pretty=format:"- %s (%h)" > $GITHUB_WORKSPACE/changelog.txt
@@ -191,38 +170,27 @@ jobs:
         run: |
 
           echo "TAG=${{ matrix.device.name }}-${COMMIT}" >> $GITHUB_ENV
-
           echo "NAME=${{ matrix.device.name }}-${DATE}" >> $GITHUB_ENV
 
       - name: Create release
         uses: softprops/action-gh-release@v2
 
         with:
-
           tag_name: ${{ env.TAG }}
-
           name: ${{ env.NAME }}
 
-          prerelease: true
 
           body: |
 
             Device: ${{ matrix.device.name }}
-
             Version: ${{ steps.version.outputs.version }}
-
             Revision: ${{ steps.version.outputs.revision }}
-
             Commit: ${{ env.COMMIT }}
-
             Build Date: ${{ env.DATE }}
-
             Recent OpenWrt Changes
-
             ${{ steps.log.outputs.log }}
 
           files: |
-
             ${{ env.DIR }}/*squashfs*.bin
             ${{ env.DIR }}/*.buildinfo
             ${{ env.DIR }}/*.manifest
