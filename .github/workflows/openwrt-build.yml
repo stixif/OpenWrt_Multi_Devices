@@ -13,7 +13,7 @@ on:
 env:
 
   REPO_URL: https://github.com/openwrt/openwrt.git
-  REPO_BRANCH: master
+  REPO_BRANCH: openwrt-25.12
   TZ: Europe/Berlin
 
 jobs:
@@ -65,6 +65,9 @@ jobs:
 
           - name: Flint2_gl-mt6000
             config: configs/Flint2_gl-mt6000.config
+
+          - name: Flint2_gl-mt6000-WAN
+            config: configs/Flint2_gl-mt6000-WAN.config
 
     steps:
 
