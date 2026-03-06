@@ -25,7 +25,7 @@ jobs:
 
     outputs:
       build: ${{ steps.check.outputs.build }}
-      commit: ${{ steps.commit.outputs.commit }}
+      #commit: ${{ steps.commit.outputs.commit }}
 	  
     steps:
 
