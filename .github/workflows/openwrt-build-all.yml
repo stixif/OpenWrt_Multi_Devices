@@ -26,7 +26,7 @@ jobs:
     outputs:
       build: ${{ steps.check.outputs.build }}
       #commit: ${{ steps.commit.outputs.commit }}
-	  
+
     steps:
 
       - name: Check OpenWrt commit
