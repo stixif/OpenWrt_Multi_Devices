@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
   schedule:
-    - cron: "0 4 * * *"
+    - cron: "0 4 * * 0"
 
 env:
 
@@ -167,12 +167,13 @@ jobs:
         id: log
         run: |
           cd openwrt
-
-          git log -15 --pretty=format:"- %s (%h)" > $GITHUB_WORKSPACE/changelog.txt
-
-          echo "log<<EOF" >> $GITHUB_OUTPUT
-          cat $GITHUB_WORKSPACE/changelog.txt >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+ 
+          {
+            echo "log<<CHANGELOG"
+            git log -15 --pretty=format:"- %s (%h)"
+            echo
+            echo "CHANGELOG"
+          } >> $GITHUB_OUTPUT
 
       - name: Determine release type
         run: |
@@ -197,7 +198,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ env.NAME }}
-
+          prerelease: ${{ env.PRERELEASE }}
 
           body: |
 
