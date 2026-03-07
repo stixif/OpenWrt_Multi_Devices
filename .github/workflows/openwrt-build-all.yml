@@ -192,7 +192,13 @@ jobs:
 
           echo "TAG=${PREFIX}-${{ matrix.device.name }}-${COMMIT}" >> $GITHUB_ENV
           echo "NAME=${PREFIX}-${{ matrix.device.name }}-${DATE}" >> $GITHUB_ENV
-
+      
+      - name: Prepare artifacts
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/artifacts
+          cp $GITHUB_WORKSPACE/openwrt/bin/targets/*/*/*squashfs*.bin $GITHUB_WORKSPACE/artifacts/
+          cp $GITHUB_WORKSPACE/openwrt/bin/targets/*/*/*.buildinfo $GITHUB_WORKSPACE/artifacts/
+      
       - name: Create release
         uses: softprops/action-gh-release@v2
 
@@ -212,11 +218,7 @@ jobs:
             Recent OpenWrt Changes
             ${{ steps.log.outputs.log }}
 
-          files: |
-            ${{ env.DIR }}/*squashfs*.bin
-            ${{ env.DIR }}/*.buildinfo
-            ${{ env.DIR }}/*.manifest
-            ${{ env.DIR }}/sha256sums
+          files: ${{ github.workspace }}/artifacts/*
 
       - name: Cleanup old releases
         uses: dev-drprasad/delete-older-releases@v0.3.4
