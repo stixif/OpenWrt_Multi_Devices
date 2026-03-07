@@ -72,11 +72,11 @@ jobs:
           - name: Beryl_gl-mt3000
             config: configs/Beryl_gl-mt3000.config
 
-          #- name: Flint2_gl-mt6000
-          #  config: configs/Flint2_gl-mt6000.config
+          - name: Flint2_gl-mt6000
+            config: configs/Flint2_gl-mt6000.config
 
-         # - name: Flint2_gl-mt6000-WAN
-         #   config: configs/Flint2_gl-mt6000-WAN.config
+          - name: Flint2_gl-mt6000-WAN
+            config: configs/Flint2_gl-mt6000-WAN.config
 
     steps:
 
