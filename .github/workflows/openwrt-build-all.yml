@@ -194,15 +194,25 @@ jobs:
   
       - name: Release tag
         run: |
-
           echo "TAG=${PREFIX}-${{ matrix.device.name }}-${COMMIT}" >> $GITHUB_ENV
           echo "NAME=${PREFIX}-${{ matrix.device.name }}-${DATE}" >> $GITHUB_ENV
-      
-      - name: Prepare artifacts
+
+      - name: Rename firmware for variants
         run: |
-          mkdir -p $GITHUB_WORKSPACE/artifacts
-          cp $GITHUB_WORKSPACE/openwrt/bin/targets/*/*/*squashfs*.bin $GITHUB_WORKSPACE/artifacts/
-          cp $GITHUB_WORKSPACE/openwrt/bin/targets/*/*/*.buildinfo $GITHUB_WORKSPACE/artifacts/
+          cd ${{ env.DIR }}
+          DEVICE="${{ matrix.device }}"
+          # Prüfen ob Variante vorhanden
+          if [[ "$DEVICE" == *"-"* ]]; then
+            VARIANT="${DEVICE#*-}"
+            echo "Variant detected: $VARIANT"
+            for f in *squashfs*.bin; do
+              if [[ "$f" != *"-$VARIANT.bin" ]]; then
+                mv "$f" "${f/.bin/-$VARIANT.bin}"
+              fi
+            done
+          else
+            echo "No variant detected"
+          fi
       
       - name: Create release
         uses: softprops/action-gh-release@v2
@@ -213,7 +223,6 @@ jobs:
           prerelease: ${{ env.PRERELEASE }}
 
           body: |
-
             Device: ${{ matrix.device.name }}
             Branch: ${{ matrix.branch }}
             Version: ${{ steps.version.outputs.version }}
@@ -223,7 +232,11 @@ jobs:
             Recent OpenWrt Changes
             ${{ steps.log.outputs.log }}
 
-          files: ${{ github.workspace }}/artifacts/*
+          files: |
+            ${{ env.DIR }}/*squashfs*.bin
+            ${{ env.DIR }}/*.buildinfo
+            ${{ env.DIR }}/*.manifest
+            ${{ env.DIR }}/sha256sums
 
       - name: Cleanup old releases
         uses: dev-drprasad/delete-older-releases@v0.3.4
