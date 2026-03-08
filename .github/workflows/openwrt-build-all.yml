@@ -97,7 +97,7 @@ jobs:
         with:
           path: |
             ~/.ccache
-            openwrt/dl
+            dl
           key: ${{ matrix.device.name }}-${{ matrix.branch }}-${{ github.run_id }}
           restore-keys: |
             ${{ matrix.device.name }}-${{ matrix.branch }}
@@ -107,6 +107,11 @@ jobs:
           git clone --depth 1 --branch ${{ matrix.branch }} $REPO_URL openwrt
           cd openwrt
           echo "COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Link dl cache
+        run: |
+          mkdir -p dl
+          ln -s $GITHUB_WORKSPACE/dl openwrt/dl
 
       - name: Update feeds
         run: |
