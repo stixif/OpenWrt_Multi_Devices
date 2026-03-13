@@ -200,7 +200,7 @@ jobs:
       - name: Rename firmware for variants
         run: |
           cd ${{ env.DIR }}
-          DEVICE="${{ matrix.device }}"
+          DEVICE="${{ matrix.device.name }}"
           # Prüfen ob Variante vorhanden
           if [[ "$DEVICE" == *"-"* ]]; then
             VARIANT="${DEVICE#*-}"
