@@ -78,6 +78,9 @@ jobs:
           - name: Flint2_gl-mt6000-WAN
             config: configs/Flint2_gl-mt6000-WAN.config
 
+          - name: Cudy_re3000_v1
+            config: configs/Cudy_re3000_v1.config
+
     steps:
 
       - uses: actions/checkout@v4
